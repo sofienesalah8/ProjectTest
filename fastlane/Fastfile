@@ -1,0 +1,43 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+xcode_select("/Applications/Xcode.app")
+setup_jenkins
+platform :ios do
+
+  desc "Generate ProjectTest"
+  lane :ProdLane do
+    ensure_git_branch(branch: "Master")
+    increment_build_number_in_plist(        
+      target: "ProjectTestProd",
+      plist_build_setting_support: true
+    )
+    git_add
+    git_commit(path: ".", message: "Increment Version build !")
+    push_to_git_remote
+
+    # build your iOS app
+    build_app(
+      scheme: "ProjectTestProd",
+      export_options: {
+        method: "development",
+        clean: true
+      }
+    )
+
+  end
+
+end
